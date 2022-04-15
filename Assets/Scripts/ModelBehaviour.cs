@@ -1,38 +1,23 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using RootMotion.FinalIK;
-using UnityEditor;
 using UnityEngine;
-[CustomEditor(typeof(ModelBehaviour))]
-public class ModelEditor : Editor
-{
-    public override void OnInspectorGUI()
-    {
-        base.OnInspectorGUI();
-        ModelBehaviour behaviour = (ModelBehaviour)target;
-
-        if (GUILayout.Button("Merge And Put"))
-        {
-            behaviour.MergeMeshs();
-        }
-    }
-
-}
 
 
 public class ModelBehaviour : MonoBehaviour
 {
     public DressIndexContainer DressIndexContainer;
     public List<MeshUpdater> meshUpdaters = new List<MeshUpdater>(); 
-    public static List<MeshFilter> MeshFilters = new List<MeshFilter>();
-    public MeshFilter ToBake;
     public MeshUpdater meshUpdater;
     bool closedDefault;
     Animator ownAnimator;
     string lastanimation;
     ArmIK[] armIKs ;
 
+    private void OnEnable()
+    {
+        UIPerformer.CurrentModel = transform.parent.gameObject;
+    }
 
     private void Start()
     {
@@ -43,43 +28,52 @@ public class ModelBehaviour : MonoBehaviour
         ownAnimator = GetComponent<Animator>();
     }
 
+    private void OnDisable()
+    {
+        EventListener.PhaseEndedActions -= ChangePose;
+    }
+
+    /// <summary>
+    /// Phase changing last frame opr.
+    /// </summary>
+    /// <param name="gameplayPhase"></param>
     public void ChangePose(GameplayPhase gameplayPhase)
     {
         switch (gameplayPhase)
         {
+            case GameplayPhase.Start:
+                break;
             case GameplayPhase.IKDrag:
+                IKActivity(true);
                 break;
             case GameplayPhase.MesureDia:
                 Change_Pose("tpose");
                 break;
             case GameplayPhase.BikiniModel:
-                foreach (var ik in armIKs)
-                {
-                    ik.enabled = false;
-                }
+                IKActivity(false);
                 Change_Pose("idle");
-                meshUpdater.enabled = true;
+                StartCoroutine(UpdateMeshs());
                 break;
             case GameplayPhase.Painting:
-                foreach (var ik in armIKs)
-                {
-                    ik.enabled = true;
-                }
-
-                for (int i = 0; i < meshUpdaters.Count; i++)
-                {
-                    meshUpdaters[i].enabled = false;
-                }
+                IKActivity(true);
                 break;
             case GameplayPhase.Customing:
+                IKActivity(false);
+                Change_Pose("lastpose");
+                StartCoroutine(UpdateMeshs());
                 break;
             case GameplayPhase.LastPose:
-                foreach (var ik in armIKs)
-                {
-                    ik.enabled = false;
-                }
-                Change_Pose("lastpose");
+
                 break;
+            
+        }
+    }
+
+    private void IKActivity(bool state)
+    {
+        foreach (var ik in armIKs)
+        {
+            ik.enabled = state;
         }
     }
 
@@ -118,21 +112,20 @@ public class ModelBehaviour : MonoBehaviour
         lastUsed.SetActive(true);
     }
 
-    internal void MergeMeshs()
+    IEnumerator UpdateMeshs()
     {
-        Mesh bakedMesh = new Mesh();
-        MeshFilter[] filters = MeshFilters.ToArray();
-        CombineInstance[] combineInstances = new CombineInstance[filters.Length];
-        for (int i = 0; i < filters.Length; i++)
+        for (int i = 0; i < meshUpdaters.Count; i++)
         {
-            combineInstances[i].subMeshIndex = 0;
-            combineInstances[i].mesh = filters[i].sharedMesh;
-            combineInstances[i].transform = filters[i].transform.localToWorldMatrix;
+            meshUpdaters[i].enabled = true;
         }
-        bakedMesh.CombineMeshes(combineInstances);
-        ToBake.sharedMesh = bakedMesh;
-        ToBake.GetComponent<SkinnedMeshRenderer>().sharedMesh = bakedMesh;
-        ToBake.GetComponent<MeshCollider>().sharedMesh = bakedMesh;
+        meshUpdater.enabled = true;
 
+        yield return null;
+
+        for (int i = 0; i < meshUpdaters.Count; i++)
+        {
+            meshUpdaters[i].enabled = false;
+        }
+        meshUpdater.enabled = false;
     }
 }

@@ -137,6 +137,14 @@ namespace PaintIn3D
 			RightGrip = value;
 		}
 
+		public void SetChilds(bool state)
+        {
+            for (int i = 0; i < transform.childCount; i++)
+            {
+				transform.GetChild(i).gameObject.SetActive(state);
+            }
+        }
+
 		public bool GetTrigger(XRNode node)
 		{
 			switch (node)

@@ -16,6 +16,7 @@ public class InputManager : MonoBehaviour
 
     private void Start()
     {
+
         EventListener.PhaseEndedActions += CloseInputs;
         EventListener.CameraMoveEndActions += OpenInputs;
     }

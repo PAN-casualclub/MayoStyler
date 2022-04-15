@@ -7,6 +7,11 @@ public class MeshUpdater : MonoBehaviour
     public SkinnedMeshRenderer meshRenderer;
     public MeshCollider _collider;
 
+    private void OnEnable()
+    {
+        UpdateCollider();
+    }
+
     public void UpdateCollider()
     {
         Mesh colliderMesh = new Mesh();
@@ -15,8 +20,4 @@ public class MeshUpdater : MonoBehaviour
         _collider.sharedMesh = colliderMesh;
     }
 
-    private void Update()
-    {
-        UpdateCollider();
-    }
 }

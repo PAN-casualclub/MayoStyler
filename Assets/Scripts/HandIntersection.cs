@@ -2,11 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody))]
 public class HandIntersection : MonoBehaviour, IInteractable
 {
     public Transform TartgetToIntersect;
     public HandIntersection Linked;
+    public Transform IKHandler;
     Vector3 StartPos;
     internal bool isComplete;
     Collider _collider;
@@ -16,13 +16,15 @@ public class HandIntersection : MonoBehaviour, IInteractable
         EventListener.IKPhaseStartedActions += OpenIKHandler; 
     }
 
+    private void OnDisable()
+    {
+        EventListener.IKPhaseStartedActions -= OpenIKHandler;
+    }
+
     private void Start()
     {
-        StartPos = transform.localPosition;
-         GetComponent<Rigidbody>().isKinematic = true;
+        StartPos = IKHandler.position;
         _collider = GetComponent<Collider>();
-        _collider.enabled = true;
-        _collider.isTrigger = true;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -80,8 +82,8 @@ public class HandIntersection : MonoBehaviour, IInteractable
     {
         TartgetToIntersect.gameObject.SetActive(true);
         GetComponent<Renderer>().enabled = true;
+        transform.position = StartPos;
         _collider.enabled = true;
-        transform.localPosition = StartPos;
 
     }
 

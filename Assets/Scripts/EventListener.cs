@@ -1,6 +1,7 @@
 ﻿
 public enum GameplayPhase
 {
+    Start = 35,
     IKDrag = 60,
     MesureDia = 15,
     BikiniModel = 25,
@@ -11,8 +12,7 @@ public enum GameplayPhase
 
 public static class EventListener
 {
-    private static GameplayPhase currentPhase;
-
+    private static GameplayPhase currentPhase = GameplayPhase.Start;
     public static GameplayPhase CurrentPhase { get => currentPhase;}
 
     public delegate void IKPhase();
