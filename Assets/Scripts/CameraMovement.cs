@@ -8,11 +8,10 @@ using UnityEngine;
 public class CameraMovement : MonoBehaviour
 {
     Camera cameraInComponent;
-    public static List<Action> OnCameraFinished = new List<Action>();
-
+    [SerializeField , Range(.1f,1)] float camSpeed;
     private void Start()
     {
-        EventListener.PhaseFinishedActions += SetFOW;
+        EventListener.PhaseEndedActions += SetFOW;
         cameraInComponent = GetComponent<Camera>();
     }
 
@@ -23,7 +22,7 @@ public class CameraMovement : MonoBehaviour
 
     IEnumerator SetZoom(float toSet)
     {
-        float modifier = .1f;
+        float modifier = .1f + camSpeed;
 
         if (toSet <= cameraInComponent.fieldOfView)
             modifier *= -1;
@@ -49,15 +48,8 @@ public class CameraMovement : MonoBehaviour
 
         }
 
-        if (OnCameraFinished.Count > 0)
-        {
-            foreach (var func in OnCameraFinished)
-            {
-                func();
-            }
-        }
+        EventListener.OnCameraMovementFinished();
 
-        OnCameraFinished.Clear();
     }
 
 

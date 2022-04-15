@@ -1,10 +1,9 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
-public class HandIntersection : MonoBehaviour
+public class HandIntersection : MonoBehaviour, IInteractable
 {
     public Transform TartgetToIntersect;
     public HandIntersection Linked;
@@ -14,7 +13,7 @@ public class HandIntersection : MonoBehaviour
 
     private void Awake()
     {
-        EventListener.OnIKPlayStarted += OpenIKHandler; 
+        EventListener.IKPhaseStartedActions += OpenIKHandler; 
     }
 
     private void Start()
@@ -32,6 +31,8 @@ public class HandIntersection : MonoBehaviour
         {
             isComplete = true;
             TartgetToIntersect.gameObject.SetActive(false);
+            InputManager.ForceReleaseInput();
+            CloseHandlerInput();
             if (CheckAllAccomplished())
             {
                 OnAccomplished();
@@ -54,26 +55,26 @@ public class HandIntersection : MonoBehaviour
         CloseIKHandlers();
     }
 
-    public void CloseHandler()
+    public void CloseHandlerInput()
     {
         GetComponent<Renderer>().enabled = false;
         _collider.enabled = false;
-        isComplete = false;
+    }
+
+    public void CloseHandler()
+    {
+            CloseHandlerInput();
+            isComplete = false;
     }
 
     private void CloseIKHandlers()
     {
         InputManager.ForceReleaseInput();
-        CameraMovement.OnCameraFinished.Add(OpenInput);
         EventListener.OnPhaseEnded(GameplayPhase.MesureDia);
         CloseHandler();
         Linked.CloseHandler();
     }
 
-    public void OpenInput()
-    {
-        InputManager.LockInputs = false;
-    }
 
     public void OpenIKHandler()
     {
@@ -82,5 +83,18 @@ public class HandIntersection : MonoBehaviour
         _collider.enabled = true;
         transform.localPosition = StartPos;
 
+    }
+
+    public void OnInteracted()
+    {
+    }
+
+    public void OnExit()
+    {
+
+    }
+
+    public void OnChanged()
+    {
     }
 }

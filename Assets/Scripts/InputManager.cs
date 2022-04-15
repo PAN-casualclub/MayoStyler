@@ -4,19 +4,20 @@ public class InputManager : MonoBehaviour
 {
     public static Transform CurrentDragged;
     public static IInteractable CurrentIntegrated;
+    public static bool ObjectInControl;
+    static IInteractable lastInteractable;
     public static bool LockInputs;
     public LayerMask InteracLayers;
     public LayerMask InjectionLayers;
-    public float FixedPosition_Z;
     public float InputSensivity;
     public RaycastHit[] hitted = new RaycastHit[1];
-
     Vector3 offsetOnControl;
     float fixedZ;
 
     private void Start()
     {
-        EventListener.PhaseFinishedActions += CloseInputs;
+        EventListener.PhaseEndedActions += CloseInputs;
+        EventListener.CameraMoveEndActions += OpenInputs;
     }
 
     void Update()
@@ -41,7 +42,7 @@ public class InputManager : MonoBehaviour
 
         if (Input.GetMouseButton(0))
         {
-            if (CurrentDragged == null)
+            if (CurrentDragged == null || EventListener.CurrentPhase == GameplayPhase.Painting || ObjectInControl)
             {
                 return;
             }
@@ -52,7 +53,9 @@ public class InputManager : MonoBehaviour
 
         if (Input.GetMouseButtonUp(0))
         {
-            if (CurrentDragged == null)
+            offsetOnControl = Vector3.zero;
+
+            if (CurrentDragged == null )
             {
                 if (EventListener.CurrentPhase == GameplayPhase.MesureDia)
                     UIPerformer.StopRotate();
@@ -78,11 +81,16 @@ public class InputManager : MonoBehaviour
         if (Physics.Raycast(ray, out hit, 100, InteracLayers))
         {
             CurrentDragged = hit.transform;
-
             if (CurrentDragged.TryGetComponent(out CurrentIntegrated))
             {
                 CurrentIntegrated.OnInteracted();
+
+                if (lastInteractable != null && lastInteractable != CurrentIntegrated)
+                    lastInteractable.OnChanged();
+
+                lastInteractable = CurrentIntegrated;
             }
+
         }
 
     }
@@ -96,13 +104,41 @@ public class InputManager : MonoBehaviour
 
     public static  void ForceReleaseInput()
     {
-        CurrentDragged = null;
-        CurrentIntegrated = null;
+        if (CurrentIntegrated != null)
+            CurrentIntegrated.OnExit();
+
+        if (EventListener.CurrentPhase != GameplayPhase.Painting)
+        {
+            CurrentDragged = null;
+            CurrentIntegrated = null;
+            lastInteractable = null;
+        }
+        ObjectInControl = false;
+    }
+
+    public static void ForceControllObject(GameObject toControll)
+    {
+        ForceReleaseInput();
+        CurrentDragged = toControll.transform;
+        if (CurrentDragged.TryGetComponent(out CurrentIntegrated))
+        {
+            CurrentIntegrated.OnInteracted();
+
+            if (lastInteractable != null && lastInteractable != CurrentIntegrated)
+                lastInteractable.OnChanged();
+
+            lastInteractable = CurrentIntegrated;
+        }
     }
 
     public static void CloseInputs(GameplayPhase gameplayPhase)
     {
         LockInputs = true;
+    }
+
+    public static void OpenInputs()
+    {
+        LockInputs = false;
     }
 }
 
