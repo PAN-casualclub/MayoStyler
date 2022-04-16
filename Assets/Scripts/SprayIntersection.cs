@@ -13,7 +13,7 @@ public class SprayIntersection : MonoBehaviour, IInteractable
     {
         startPosition = transform.position;
         OwnerManager = transform.parent;
-        OnWorkingArea = transform.root;
+        OnWorkingArea = OwnerManager.parent;
     }
 
     public void OnExit()
