@@ -56,7 +56,7 @@ public class InputManager : MonoBehaviour
         {
             offsetOnControl = Vector3.zero;
 
-            if (CurrentDragged == null )
+            if (CurrentDragged == null)
             {
                 if (EventListener.CurrentPhase == GameplayPhase.MesureDia)
                     UIPerformer.StopRotate();
@@ -99,11 +99,11 @@ public class InputManager : MonoBehaviour
     public Transform HitInjections(Vector3 inputPosition)
     {
         Ray ray = Camera.main.ScreenPointToRay(inputPosition);
-        hitted =  Physics.RaycastAll(ray,10, InjectionLayers);
+        hitted = Physics.RaycastAll(ray, 10, InjectionLayers);
         return hitted[0].transform;
     }
 
-    public static  void ForceReleaseInput()
+    public static void ForceReleaseInput()
     {
         if (CurrentIntegrated != null)
             CurrentIntegrated.OnExit();
@@ -114,6 +114,17 @@ public class InputManager : MonoBehaviour
             CurrentIntegrated = null;
             lastInteractable = null;
         }
+        ObjectInControl = false;
+    }
+
+    public static void ForceReleaseInput(bool isCandy = false)
+    {
+        if (!isCandy)
+            return;
+
+        CurrentDragged = null;
+        CurrentIntegrated = null;
+        lastInteractable = null;
         ObjectInControl = false;
     }
 

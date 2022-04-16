@@ -16,6 +16,12 @@ public class SprayIntersection : MonoBehaviour, IInteractable
         OnWorkingArea = OwnerManager.parent;
     }
 
+    private void OnDisable()
+    {
+        transform.parent = OwnerManager.transform;
+        transform.position = startPosition;
+    }
+
     public void OnExit()
     {
         trackTool.OnTriggerRelease.Invoke();

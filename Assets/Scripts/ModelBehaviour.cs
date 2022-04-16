@@ -7,7 +7,7 @@ using UnityEngine;
 public class ModelBehaviour : MonoBehaviour
 {
     public DressIndexContainer DressIndexContainer;
-    public List<MeshUpdater> meshUpdaters = new List<MeshUpdater>(); 
+    public static List<MeshUpdater> meshUpdaters = new List<MeshUpdater>(); 
     public MeshUpdater meshUpdater;
     bool closedDefault;
     Animator ownAnimator;
@@ -52,18 +52,15 @@ public class ModelBehaviour : MonoBehaviour
             case GameplayPhase.BikiniModel:
                 IKActivity(false);
                 Change_Pose("idle");
-                StartCoroutine(UpdateMeshs());
                 break;
             case GameplayPhase.Painting:
-                IKActivity(true);
+                StartCoroutine(ChangePosByDelay("tpose"));
                 break;
             case GameplayPhase.Customing:
                 IKActivity(false);
-                Change_Pose("lastpose");
-                StartCoroutine(UpdateMeshs());
+                StartCoroutine(ChangePosByDelay("lastpose"));
                 break;
             case GameplayPhase.LastPose:
-
                 break;
             
         }
@@ -79,6 +76,7 @@ public class ModelBehaviour : MonoBehaviour
 
     private void Change_Pose(string poseName)
     {
+        ownAnimator.enabled = true;
         if (!string.IsNullOrEmpty(lastanimation))
         {
             ownAnimator.ResetTrigger(lastanimation);
@@ -86,7 +84,20 @@ public class ModelBehaviour : MonoBehaviour
         ownAnimator.SetTrigger(poseName);
         lastanimation = poseName;
     }
-    
+
+    IEnumerator ChangePosByDelay(string poseName)
+    {
+        if (!string.IsNullOrEmpty(lastanimation))
+        {
+            ownAnimator.ResetTrigger(lastanimation);
+        }
+        ownAnimator.SetTrigger(poseName);
+        lastanimation = poseName;
+        yield return new WaitForSeconds(.3f);
+        ownAnimator.enabled = false;
+        UpdateMeshs();
+    }
+
 
     public void ChangeModelDress()
     {
@@ -112,20 +123,15 @@ public class ModelBehaviour : MonoBehaviour
         lastUsed.SetActive(true);
     }
 
-    IEnumerator UpdateMeshs()
+    void UpdateMeshs()
     {
         for (int i = 0; i < meshUpdaters.Count; i++)
         {
-            meshUpdaters[i].enabled = true;
+            if (meshUpdaters[i].gameObject.activeInHierarchy)
+            {
+                meshUpdaters[i].UpdateCollider();
+            }
         }
-        meshUpdater.enabled = true;
 
-        yield return null;
-
-        for (int i = 0; i < meshUpdaters.Count; i++)
-        {
-            meshUpdaters[i].enabled = false;
-        }
-        meshUpdater.enabled = false;
     }
 }

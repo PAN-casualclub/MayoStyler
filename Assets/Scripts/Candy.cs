@@ -8,7 +8,7 @@ public class Candy : MonoBehaviour, IInteractable
     internal CandyData data;
     private void Update()
     {
-        if (bIsAttached)
+        if (bIsAttached || !gameObject.activeInHierarchy)
             return;
 
         if (bIsFixed)
@@ -36,6 +36,7 @@ public class Candy : MonoBehaviour, IInteractable
         else
         {
             attached = false;
+            InputManager.ObjectInControl = false;
         }
     }
 
@@ -53,6 +54,7 @@ public class Candy : MonoBehaviour, IInteractable
         else
         {
             data.BackToPool(gameObject);
+            InputManager.ForceReleaseInput(true);
         }
 
     }

@@ -20,7 +20,11 @@ public class CandyButtons : MonoBehaviour
         GameObject currentCandy = candyData.GetCandy();
         currentCandy.transform.position = transform.GetChild(0).position;
         currentCandy.SetActive(true);
-        Candy comp = currentCandy.AddComponent<Candy>();
+        Candy comp;
+        if (!currentCandy.TryGetComponent(out comp))
+        {
+            comp = currentCandy.AddComponent<Candy>();
+        }
         comp.data = candyData;
         InputManager.ForceControllObject(currentCandy);
     }

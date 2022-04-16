@@ -105,6 +105,7 @@ public class UIPerformer : MonoBehaviour
                 EventListener.OnPhaseEnded(GameplayPhase.LastPose);
                 break;
             case GameplayPhase.LastPose:
+                CloseNextButton_Img();
                 RotationButtons.SetActive(false);
                 RunBlendAnimation();
                 RunWayAnimation(Vector3.right,Table);
@@ -251,6 +252,11 @@ public class UIPerformer : MonoBehaviour
             yield return null;
         }
 
+        if(way.x > 0)
+        {
+            // Phase Ends Restarted Game Wait Table For Open
+            OpenNextButton_Img();
+        }
 
     }
 }

@@ -9,7 +9,12 @@ public class MeshUpdater : MonoBehaviour
 
     private void OnEnable()
     {
-        UpdateCollider();
+        ModelBehaviour.meshUpdaters.Add(this);
+    }
+
+    private void OnDisable()
+    {
+        ModelBehaviour.meshUpdaters.Remove(this);
     }
 
     public void UpdateCollider()
