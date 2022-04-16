@@ -3,7 +3,10 @@ using UnityEngine;
 using UnityEngine.UI;
 public class UIPerformer : MonoBehaviour
 {
-    private const float BlendSpeedIncreaser = 1f;
+    [Range(1,5)]public float BlendSpeedIncreaser = 1f;
+    [Range(.01f,1)]public float MoveAnimationIncreaser = .01f;
+    [Range(1, 10)] public float RotaterButtonTorque = 3;
+
     [SerializeField] Button nextButton;
     [SerializeField] GameObject Scroll;
     [SerializeField] GameObject Sprays;
@@ -16,7 +19,6 @@ public class UIPerformer : MonoBehaviour
     [SerializeField] GameObject CharPrefabToSpawn;
 
     public Transform rotatedObject;
-    [Range(1, 50)] public float rotationSpeed = 20;
     static bool rotate;
     static Vector3 direction;
 
@@ -29,10 +31,10 @@ public class UIPerformer : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (rotate == false)
+        if (rotate == false || InputManager.LockInputs)
             return;
 
-        rotatedObject.Rotate(direction * rotationSpeed);
+        rotatedObject.Rotate(direction * RotaterButtonTorque);
     }
 
     public void RotateToRight()
@@ -247,7 +249,7 @@ public class UIPerformer : MonoBehaviour
 
         while (Mathf.Abs(mag) > .1f)
         {
-            transformToMove.position = Vector3.Lerp(transformToMove.position, target, .01f);
+            transformToMove.position = Vector3.Lerp(transformToMove.position, target, MoveAnimationIncreaser);
             mag = (transformToMove.position - target).magnitude;
             yield return null;
         }
