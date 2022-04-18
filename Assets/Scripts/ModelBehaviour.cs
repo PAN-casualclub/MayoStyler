@@ -11,9 +11,12 @@ public class ModelBehaviour : MonoBehaviour
     public MeshUpdater meshUpdater;
     bool closedDefault;
     Animator ownAnimator;
-    string lastanimation;
     ArmIK[] armIKs;
-
+    int lastAnimationId;
+    static readonly int TriggerHash_Idle = Animator.StringToHash("idle");
+    static readonly int TriggerHash_Tpose = Animator.StringToHash("tpose");
+    static readonly int TriggerHash_TposeFast = Animator.StringToHash("tposefast");
+    static readonly int TriggerHash_LastPose = Animator.StringToHash("lastpose");
 
     private void OnEnable()
     {
@@ -51,7 +54,7 @@ public class ModelBehaviour : MonoBehaviour
                 break;
             case GameplayPhase.BikiniModel:
                 IKActivity(false);
-                Change_Pose("tposefast");
+                Change_Pose(TriggerHash_TposeFast);
                 break;
             case GameplayPhase.Painting:
                 UpdateMeshs();
@@ -60,7 +63,7 @@ public class ModelBehaviour : MonoBehaviour
                 UpdateMeshs();
                 break;
             case GameplayPhase.LastPose:
-                Change_Pose("lastpose");
+                Change_Pose(TriggerHash_LastPose);
                 break;
 
         }
@@ -74,36 +77,38 @@ public class ModelBehaviour : MonoBehaviour
         }
     }
 
-    private void Change_Pose(string poseName)
+    private void Change_Pose(int poseId)
     {
         ownAnimator.enabled = true;
-        if (!string.IsNullOrEmpty(lastanimation))
+        if (lastAnimationId != poseId)
         {
-            ownAnimator.ResetTrigger(lastanimation);
+            if (lastAnimationId != 0)
+                ownAnimator.ResetTrigger(lastAnimationId);
         }
-        ownAnimator.SetTrigger(poseName);
-        lastanimation = poseName;
+        ownAnimator.SetTrigger(poseId);
+        lastAnimationId = poseId;
     }
 
-    IEnumerator ChangePosByDelay(string poseName)
+    IEnumerator ChangePosByDelay(int poseId)
     {
-        if (!string.IsNullOrEmpty(lastanimation))
+        if (lastAnimationId != poseId)
         {
-            ownAnimator.ResetTrigger(lastanimation);
+            if (lastAnimationId != 0)
+                ownAnimator.ResetTrigger(lastAnimationId);
         }
-        ownAnimator.SetTrigger(poseName);
-        lastanimation = poseName;
+        ownAnimator.SetTrigger(poseId);
+        lastAnimationId = poseId;
         yield return new WaitForSeconds(.3f);
 
         UpdateMeshs();
     }
 
-    IEnumerator ChangePosByDelay(string poseName, string nextPoseName, bool includeUpdate)
+    IEnumerator ChangePosByDelay(int poseId, int nextPoseId, bool includeUpdate)
     {
         IKActivity(false);
-        Change_Pose(poseName);
+        Change_Pose(poseId);
         yield return new WaitForSeconds(.3f);
-        Change_Pose(nextPoseName);
+        Change_Pose(nextPoseId);
         if (includeUpdate)
         {
             yield return new WaitForSeconds(.3f);

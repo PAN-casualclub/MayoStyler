@@ -17,7 +17,8 @@ public class UIPerformer : MonoBehaviour
     [SerializeField] SkinnedMeshRenderer Curtain;
     [SerializeField] Transform Table;
     [SerializeField] TextMeshProUGUI LevelText;
-
+    [SerializeField] Transform SpreyParent;
+    public static SprayIntersection[] spreys;
     [Tooltip("Temporary !")]
     [SerializeField] GameObject CharPrefabToSpawn;
 
@@ -27,6 +28,7 @@ public class UIPerformer : MonoBehaviour
 
     private void Start()
     {
+        spreys = SpreyParent.GetComponentsInChildren<SprayIntersection>();
         currentLevel++;
         EnableLevelText(true);
         OpenNextButton_Img();
@@ -102,8 +104,7 @@ public class UIPerformer : MonoBehaviour
                 break;
             case GameplayPhase.Painting:
                 CloseNextButton_Img();
-                Sprays.SetActive(false);
-                //RotationButtons.SetActive(false);
+                CloseSafetlySprays();
                 EventListener.OnPhaseEnded(GameplayPhase.Customing);
                 break;
             case GameplayPhase.Customing:
@@ -122,6 +123,26 @@ public class UIPerformer : MonoBehaviour
                 break;
 
         }
+    }
+
+    private void CloseSafetlySprays()
+    {
+        InputManager.ForceReleaseInput();
+        foreach (var sp3 in spreys)
+        {
+            sp3.gameObject.SetActive(false);
+        }
+        Sprays.SetActive(false);
+    }
+
+    private void OpenSafetlySprays()
+    {
+        InputManager.ForceReleaseInput();
+        foreach (var sp3 in spreys)
+        {
+            sp3.gameObject.SetActive(true);
+        }
+        Sprays.SetActive(true);
     }
 
     /// <summary>
@@ -182,7 +203,7 @@ public class UIPerformer : MonoBehaviour
                 break;
             case GameplayPhase.Painting:
                 RotationButtons.SetActive(true);
-                Sprays.SetActive(true);
+                OpenSafetlySprays();
                 OpenNextButton_Img();
                 break;
             case GameplayPhase.Customing:

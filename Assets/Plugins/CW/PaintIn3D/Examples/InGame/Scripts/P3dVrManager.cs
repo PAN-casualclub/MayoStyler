@@ -23,6 +23,10 @@ namespace PaintIn3D
 			}
 		}
 
+
+
+
+
 		/// <summary>This key allows you to reset the VR orientation.</summary>
 		//public KeyCode RecenterKey { set { recenterKey = value; } get { return recenterKey; } } [SerializeField] private KeyCode recenterKey = KeyCode.Space;
 
@@ -83,6 +87,7 @@ namespace PaintIn3D
 		private static List<XRNodeState> states = new List<XRNodeState>();
 
 		private static List<P3dVrTool> tempTools = new List<P3dVrTool>();
+
 
 		/// <summary>This stores all active and enabled instances in the open scenes.</summary>
 		public static LinkedList<P3dVrManager> Instances { get { return instances; } } private static LinkedList<P3dVrManager> instances = new LinkedList<P3dVrManager>(); private LinkedListNode<P3dVrManager> instancesNode;
@@ -326,7 +331,6 @@ namespace PaintIn3D
 
 			return false;
 		}
-
 		protected virtual void OnEnable()
 		{
 			instancesNode = instances.AddLast(this);
