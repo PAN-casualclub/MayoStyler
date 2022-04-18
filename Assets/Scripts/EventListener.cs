@@ -7,7 +7,7 @@ public enum GameplayPhase
     BikiniModel = 25,
     Painting = 20,
     Customing = 28,
-    LastPose = 30,
+    LastPose = 40,
 }
 
 public static class EventListener

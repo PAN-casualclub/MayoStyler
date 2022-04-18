@@ -6,6 +6,7 @@ public class DebugContentManager : MonoBehaviour
     [SerializeField] Slider SliderXAxis;
     [SerializeField] Slider SliderYAxis;
     [SerializeField] Slider SliderFOW;
+    [SerializeField] Slider SliderCutain;
     GameObject configPanel;
     float ScreenLimitX;
     float ScreenLimitY;
@@ -30,6 +31,9 @@ public class DebugContentManager : MonoBehaviour
         SliderFOW.maxValue = 100;
         SliderFOW.minValue = 5;
         SliderFOW.value = fow;
+        SliderCutain.minValue = 0;
+        SliderCutain.maxValue = 100;
+        SliderCutain.value = 0;
 
         configPanel.SetActive(false);
     }
@@ -127,6 +131,11 @@ public class DebugContentManager : MonoBehaviour
         toFow.fieldOfView = sliderValue;
     }
 
+    public void OnSliderCutainBlend(SkinnedMeshRenderer toBlend)
+    {
+        float sliderValue = SliderCutain.value;
+        toBlend.SetBlendShapeWeight(0,sliderValue);
+    }
 
 
 }

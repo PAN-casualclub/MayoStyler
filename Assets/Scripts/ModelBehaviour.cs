@@ -7,13 +7,13 @@ using UnityEngine;
 public class ModelBehaviour : MonoBehaviour
 {
     public DressIndexContainer DressIndexContainer;
-    public static List<MeshUpdater> meshUpdaters = new List<MeshUpdater>(); 
+    public static List<MeshUpdater> meshUpdaters = new List<MeshUpdater>();
     public MeshUpdater meshUpdater;
     bool closedDefault;
     Animator ownAnimator;
     string lastanimation;
-    ArmIK[] armIKs ;
-
+    ArmIK[] armIKs;
+    int hash1;
     private void OnEnable()
     {
         UIPerformer.CurrentModel = transform.parent.gameObject;
@@ -47,22 +47,19 @@ public class ModelBehaviour : MonoBehaviour
                 IKActivity(true);
                 break;
             case GameplayPhase.MesureDia:
-                Change_Pose("tpose");
                 break;
             case GameplayPhase.BikiniModel:
-                IKActivity(false);
-                Change_Pose("idle");
+                StartCoroutine(ChangePosByDelay("tposefast", "idle", false));
                 break;
             case GameplayPhase.Painting:
-                StartCoroutine(ChangePosByDelay("tpose"));
+                StartCoroutine(ChangePosByDelay("idle", "tpose", true));
                 break;
             case GameplayPhase.Customing:
                 break;
             case GameplayPhase.LastPose:
-                IKActivity(false);
                 Change_Pose("lastpose");
                 break;
-            
+
         }
     }
 
@@ -94,8 +91,24 @@ public class ModelBehaviour : MonoBehaviour
         ownAnimator.SetTrigger(poseName);
         lastanimation = poseName;
         yield return new WaitForSeconds(.3f);
+
         ownAnimator.enabled = false;
         UpdateMeshs();
+    }
+
+    IEnumerator ChangePosByDelay(string poseName, string nextPoseName, bool includeUpdate)
+    {
+        IKActivity(false);
+        Change_Pose(poseName);
+        yield return new WaitForSeconds(.3f);
+        Change_Pose(nextPoseName);
+        if (includeUpdate)
+        {
+            yield return new WaitForSeconds(.3f);
+            ownAnimator.enabled = false;
+            UpdateMeshs();
+        }
+
     }
 
 

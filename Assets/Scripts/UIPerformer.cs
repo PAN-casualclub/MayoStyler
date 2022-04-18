@@ -1,8 +1,10 @@
 using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 public class UIPerformer : MonoBehaviour
 {
+    int currentLevel;
     [Range(1,5)]public float BlendSpeedIncreaser = 1f;
     [Range(.01f,1)]public float MoveAnimationIncreaser = .01f;
     [Range(1, 10)] public float RotaterButtonTorque = 3;
@@ -14,6 +16,7 @@ public class UIPerformer : MonoBehaviour
     [SerializeField] GameObject RotationButtons;
     [SerializeField] SkinnedMeshRenderer Curtain;
     [SerializeField] Transform Table;
+    [SerializeField] TextMeshProUGUI LevelText;
 
     [Tooltip("Temporary !")]
     [SerializeField] GameObject CharPrefabToSpawn;
@@ -24,6 +27,8 @@ public class UIPerformer : MonoBehaviour
 
     private void Start()
     {
+        currentLevel++;
+        EnableLevelText(true);
         OpenNextButton_Img();
         EventListener.PhaseEndedActions += OnPhaseUI;
         EventListener.CameraMoveEndActions += OnCameraEndsUI;
@@ -104,14 +109,16 @@ public class UIPerformer : MonoBehaviour
             case GameplayPhase.Customing:
                 CloseNextButton_Img();
                 CandyCanvas.SetActive(false);
+                RotationButtons.SetActive(false);
                 EventListener.OnPhaseEnded(GameplayPhase.LastPose);
                 break;
             case GameplayPhase.LastPose:
                 CloseNextButton_Img();
-                RotationButtons.SetActive(false);
                 RunBlendAnimation();
                 RunWayAnimation(Vector3.right,Table);
                 EventListener.OnPhaseEnded(GameplayPhase.Start);
+                currentLevel++;
+                LevelText.text = $"{currentLevel}";
                 break;
 
         }
@@ -126,6 +133,7 @@ public class UIPerformer : MonoBehaviour
         switch (phase)
         {
             case GameplayPhase.Start:
+                LastSpawned = Instantiate(CharPrefabToSpawn);
                 if (LastSpawned != null)
                 {
                     Destroy(CurrentModel);
@@ -149,6 +157,7 @@ public class UIPerformer : MonoBehaviour
             case GameplayPhase.Customing:
                 break;
             case GameplayPhase.LastPose:
+                RotateToRight();
                 break;
 
         }
@@ -182,7 +191,6 @@ public class UIPerformer : MonoBehaviour
                 break;
             case GameplayPhase.LastPose:
                 OpenNextButton_Img();
-                LastSpawned = Instantiate(CharPrefabToSpawn);
                 break;
 
         }
@@ -258,7 +266,14 @@ public class UIPerformer : MonoBehaviour
         {
             // Phase Ends Restarted Game Wait Table For Open
             OpenNextButton_Img();
+            EnableLevelText(true);
         }
 
+    }
+
+    private void EnableLevelText(bool state)
+    {
+        LevelText.text = $"{currentLevel}";
+        LevelText.transform.parent.gameObject.SetActive(state);
     }
 }

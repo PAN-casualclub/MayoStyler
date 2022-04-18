@@ -8,12 +8,13 @@ public class Candy : MonoBehaviour, IInteractable
     internal CandyData data;
     internal Transform parentSuppose;
     internal Vector3 snapPos;
+    int tryCacth;
     private void OnEnable()
     {
         bIsFixed = false;
         bIsAttached = false;
         bOnSurface = false;
-
+        tryCacth = 0;
     }
 
 
@@ -27,12 +28,17 @@ public class Candy : MonoBehaviour, IInteractable
 
         if (bIsFixed)
         {
+            tryCacth++;
             transform.parent = parentSuppose;
             transform.position = snapPos;
             if (transform.parent != null)
             {
                 bIsAttached = true;
             }
+
+            if (tryCacth > 5)
+                Destroy(this);
+
             return;
         }
 

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HandIntersection : MonoBehaviour, IInteractable
+public class HandIntersection : MonoBehaviour
 {
     public Transform TartgetToIntersect;
     public HandIntersection Linked;
@@ -83,20 +83,8 @@ public class HandIntersection : MonoBehaviour, IInteractable
         TartgetToIntersect.gameObject.SetActive(true);
         GetComponent<Renderer>().enabled = true;
         transform.position = StartPos;
-        _collider.enabled = true;
 
     }
 
-    public void OnInteracted()
-    {
-    }
-
-    public void OnExit()
-    {
-
-    }
-
-    public void OnChanged()
-    {
-    }
+   
 }
