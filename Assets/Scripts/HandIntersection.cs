@@ -61,6 +61,8 @@ public class HandIntersection : MonoBehaviour
     {
         GetComponent<Renderer>().enabled = false;
         _collider.enabled = false;
+        InputManager.ForceReleaseInput();
+        IKHandler.gameObject.SetActive(false);
     }
 
     public void CloseHandler()
@@ -83,6 +85,7 @@ public class HandIntersection : MonoBehaviour
         TartgetToIntersect.gameObject.SetActive(true);
         GetComponent<Renderer>().enabled = true;
         transform.position = StartPos;
+        _collider.enabled = true;
 
     }
 

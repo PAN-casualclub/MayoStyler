@@ -13,7 +13,8 @@ public class ModelBehaviour : MonoBehaviour
     Animator ownAnimator;
     string lastanimation;
     ArmIK[] armIKs;
-    int hash1;
+
+
     private void OnEnable()
     {
         UIPerformer.CurrentModel = transform.parent.gameObject;
@@ -49,12 +50,14 @@ public class ModelBehaviour : MonoBehaviour
             case GameplayPhase.MesureDia:
                 break;
             case GameplayPhase.BikiniModel:
-                StartCoroutine(ChangePosByDelay("tposefast", "idle", false));
+                IKActivity(false);
+                Change_Pose("tposefast");
                 break;
             case GameplayPhase.Painting:
-                StartCoroutine(ChangePosByDelay("idle", "tpose", true));
+                UpdateMeshs();
                 break;
             case GameplayPhase.Customing:
+                UpdateMeshs();
                 break;
             case GameplayPhase.LastPose:
                 Change_Pose("lastpose");
@@ -92,7 +95,6 @@ public class ModelBehaviour : MonoBehaviour
         lastanimation = poseName;
         yield return new WaitForSeconds(.3f);
 
-        ownAnimator.enabled = false;
         UpdateMeshs();
     }
 

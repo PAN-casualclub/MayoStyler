@@ -2,19 +2,23 @@
 
 public class Candy : MonoBehaviour, IInteractable
 {
-    public bool bIsFixed;
-    public bool bIsAttached;
-    public bool bOnSurface;
     internal CandyData data;
-    internal Transform parentSuppose;
-    internal Vector3 snapPos;
-    int tryCacth;
+
+    bool bIsFixed;
+    bool bIsAttached;
+    bool bOnSurface;
+    Transform parentSuppose;
+    Vector3 snapPos;
+    Vector3 snapRot;
+    int tryCacth_SnapErr;
+
     private void OnEnable()
     {
+        parentSuppose = null;
         bIsFixed = false;
         bIsAttached = false;
         bOnSurface = false;
-        tryCacth = 0;
+        tryCacth_SnapErr = 0;
     }
 
 
@@ -28,16 +32,17 @@ public class Candy : MonoBehaviour, IInteractable
 
         if (bIsFixed)
         {
-            tryCacth++;
+            tryCacth_SnapErr++;
             transform.parent = parentSuppose;
             transform.position = snapPos;
+            transform.rotation = Quaternion.FromToRotation(Vector3.forward, snapRot);
             if (transform.parent != null)
             {
                 bIsAttached = true;
             }
 
-            if (tryCacth > 5)
-                Destroy(this);
+            if (tryCacth_SnapErr > 5)
+                Destroy(gameObject);
 
             return;
         }
@@ -54,7 +59,7 @@ public class Candy : MonoBehaviour, IInteractable
         {
             snapPos = new Vector3(hit.point.x, hit.point.y, hit.point.z - .01f);
             transform.position = Vector3.Lerp(transform.position, snapPos, .05f);
-            transform.rotation = Quaternion.FromToRotation(Vector3.forward, hit.normal);
+            snapRot = hit.normal;
             InputManager.ObjectInControl = true;
             bOnSurface = true;
         }
