@@ -2,40 +2,59 @@
 
 public class Candy : MonoBehaviour, IInteractable
 {
-    public bool attached;
     public bool bIsFixed;
     public bool bIsAttached;
+    public bool bOnSurface;
     internal CandyData data;
+    internal Transform parentSuppose;
+    internal Vector3 snapPos;
+    private void OnEnable()
+    {
+        bIsFixed = false;
+        bIsAttached = false;
+        bOnSurface = false;
+
+    }
+
+
     private void Update()
     {
         if (bIsAttached || !gameObject.activeInHierarchy)
+        {
+            Destroy(this);
             return;
+        }
 
         if (bIsFixed)
         {
-            RaycastHit raycastHit;
-            if (Physics.Raycast(transform.position,Vector3.forward,out raycastHit,10,1<<3))
+            transform.parent = parentSuppose;
+            transform.position = snapPos;
+            if (transform.parent != null)
             {
-                transform.position = Vector3.Lerp(transform.position, raycastHit.point, 1f);
                 bIsAttached = true;
-                transform.parent = raycastHit.transform;
             }
             return;
         }
 
+        RaycastHit raycastHit;
+        if (Physics.Raycast(transform.position, Vector3.forward, out raycastHit, 1, 1 << 8))
+        {
+            parentSuppose = raycastHit.transform;
+        }
+
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
-        if(Physics.Raycast(ray,out hit, 10, 1 << 3))
+        if (Physics.Raycast(ray, out hit, 10, 1 << 3))
         {
-            Vector3 targetPos = new Vector3(hit.point.x,hit.point.y,hit.point.z - .01f);
-            transform.position = Vector3.Lerp(transform.position, targetPos, .05f);
-            transform.rotation = Quaternion.FromToRotation(Vector3.forward,hit.normal);
+            snapPos = new Vector3(hit.point.x, hit.point.y, hit.point.z - .01f);
+            transform.position = Vector3.Lerp(transform.position, snapPos, .05f);
+            transform.rotation = Quaternion.FromToRotation(Vector3.forward, hit.normal);
             InputManager.ObjectInControl = true;
-            attached = true;
+            bOnSurface = true;
         }
         else
         {
-            attached = false;
+            bOnSurface = false;
             InputManager.ObjectInControl = false;
         }
     }
@@ -47,7 +66,7 @@ public class Candy : MonoBehaviour, IInteractable
 
     public void OnExit()
     {
-        if (attached)
+        if (bOnSurface)
         {
             bIsFixed = true;
         }

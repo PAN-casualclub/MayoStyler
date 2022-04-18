@@ -72,7 +72,7 @@ public class HandIntersection : MonoBehaviour, IInteractable
     private void CloseIKHandlers()
     {
         InputManager.ForceReleaseInput();
-        EventListener.OnPhaseEnded(GameplayPhase.MesureDia);
+        EventListener.OnPhaseEnded(GameplayPhase.BikiniModel);
         CloseHandler();
         Linked.CloseHandler();
     }

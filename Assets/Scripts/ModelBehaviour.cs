@@ -57,10 +57,10 @@ public class ModelBehaviour : MonoBehaviour
                 StartCoroutine(ChangePosByDelay("tpose"));
                 break;
             case GameplayPhase.Customing:
-                IKActivity(false);
-                StartCoroutine(ChangePosByDelay("lastpose"));
                 break;
             case GameplayPhase.LastPose:
+                IKActivity(false);
+                Change_Pose("lastpose");
                 break;
             
         }
